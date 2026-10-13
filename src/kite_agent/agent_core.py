@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import asyncio
 import hashlib
 import sys
 from dataclasses import dataclass, field
@@ -50,7 +49,10 @@ def to_ollama_tools(tools_response: Any) -> list[dict]:
 
 
 async def run_agent(user_query: str, config: AgentConfig) -> AgentRun:
-    server = StdioServerParameters(command=sys.executable, args=["server.py"])
+    server = StdioServerParameters(
+        command=sys.executable,
+        args=["-m", "kite_agent.server"],
+    )
     result = AgentRun()
 
     async with stdio_client(server) as (read, write):

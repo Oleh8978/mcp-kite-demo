@@ -4,3 +4,8 @@ __pycache__/
 .DS_Store
 .env
 history.jsonl
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+build/
+dist/

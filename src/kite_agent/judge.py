@@ -5,7 +5,7 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass
 
-from agent_core import AgentRun
+from kite_agent.agent_core import AgentRun
 
 
 @dataclass
@@ -20,13 +20,13 @@ class TaskScore:
     detail: str = ""
 
 
-def _is_subsequence(expected: list[str], actual: list[str]) -> bool:
+def is_subsequence(expected: list[str], actual: list[str]) -> bool:
     it = iter(actual)
     return all(any(a == e for a in it) for e in expected)
 
 
-def _args_sane(run: AgentRun) -> bool:
-    """Catch the known failure: word_count receives the filename, not file content."""
+def args_sane(run: AgentRun) -> bool:
+    """Catch known failures: filename passed where content was expected."""
     for call in run.tool_calls:
         if call["name"] == "word_count":
             text = str(call["args"].get("text", ""))
@@ -39,7 +39,7 @@ def _args_sane(run: AgentRun) -> bool:
     return True
 
 
-def _answer_ok(task: dict, answer: str) -> bool:
+def answer_ok(task: dict, answer: str) -> bool:
     low = answer.lower()
     required = [n.lower() for n in task.get("expect_answer_contains", [])]
     any_of = [n.lower() for n in task.get("expect_answer_contains_any", [])]
@@ -71,24 +71,24 @@ def score_task(task: dict, run: AgentRun) -> TaskScore:
     else:
         recall = precision = 1.0
 
-    order_ok = _is_subsequence(expected, called) if expected else True
-    args_ok = _args_sane(run)
-    answer_ok = _answer_ok(task, run.final_answer)
+    order_ok_v = is_subsequence(expected, called) if expected else True
+    args_ok_v = args_sane(run)
+    answer_ok_v = answer_ok(task, run.final_answer)
 
     composite = (
         0.35 * recall
         + 0.15 * precision
-        + 0.15 * (1.0 if order_ok else 0.0)
-        + 0.15 * (1.0 if args_ok else 0.0)
-        + 0.20 * (1.0 if answer_ok else 0.0)
+        + 0.15 * (1.0 if order_ok_v else 0.0)
+        + 0.15 * (1.0 if args_ok_v else 0.0)
+        + 0.20 * (1.0 if answer_ok_v else 0.0)
     )
     return TaskScore(
         task_id=task["id"],
         tool_recall=round(recall, 3),
         tool_precision=round(precision, 3),
-        order_ok=order_ok,
-        args_ok=args_ok,
-        answer_ok=answer_ok,
+        order_ok=order_ok_v,
+        args_ok=args_ok_v,
+        answer_ok=answer_ok_v,
         composite=round(composite, 4),
         detail=f"called={called} expected={expected}",
     )
