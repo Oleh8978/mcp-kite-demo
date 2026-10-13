@@ -1,4 +1,11 @@
-"""Self-improving loop: baseline, mutate, evaluate, accept or reject."""
+"""Configuration search over a bounded mutation space.
+
+This is not self-modifying code. It walks a finite grid of agent
+configurations (system prompt, temperature, max_steps, model),
+evaluates each against a fixed benchmark, and accepts a candidate only
+if its composite score strictly exceeds the current best. The sequence
+is deterministic given a seed.
+"""
 
 from __future__ import annotations
 
@@ -49,7 +56,7 @@ async def evaluate(config: AgentConfig, tasks: list[dict], verbose: bool) -> flo
         scores.append(s)
         if verbose:
             flags = f"args_ok={s.args_ok} answer_ok={s.answer_ok}"
-            print(f"    {task['id']:<18} score={s.composite:.2f}  {flags}")
+            print(f"    {task['id']:<20} score={s.composite:.2f}  {flags}")
     return aggregate(scores)
 
 
@@ -74,7 +81,7 @@ def log_generation(gen: int, config: AgentConfig, score: float, accepted: bool) 
         f.write(json.dumps(record) + "\n")
 
 
-async def main(generations: int = 3, seed: int = 42) -> None:
+async def _run_search(generations: int, seed: int) -> None:
     rng = random.Random(seed)
     tasks = json.loads(TASKS_PATH.read_text())
     best = AgentConfig(system_prompt=PROMPTS[0])
@@ -107,11 +114,12 @@ async def main(generations: int = 3, seed: int = 42) -> None:
     print(f"history log: {HISTORY}")
 
 
-def cli() -> None:
+def main() -> None:
+    """Synchronous entry point for the kite-search console script."""
     gens = int(sys.argv[1]) if len(sys.argv) > 1 else 3
     seed = int(sys.argv[2]) if len(sys.argv) > 2 else 42
-    asyncio.run(main(gens, seed))
+    asyncio.run(_run_search(gens, seed))
 
 
 if __name__ == "__main__":
-    cli()
+    main()

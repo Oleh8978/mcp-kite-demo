@@ -25,8 +25,8 @@ def is_subsequence(expected: list[str], actual: list[str]) -> bool:
     return all(any(a == e for a in it) for e in expected)
 
 
-def args_sane(run: AgentRun) -> bool:
-    """Catch known failures: filename passed where content was expected."""
+def args_sane(run: AgentRun, task: dict | None = None) -> bool:
+    """Catch known failures and task-specific forbidden argument patterns."""
     for call in run.tool_calls:
         if call["name"] == "word_count":
             text = str(call["args"].get("text", ""))
@@ -36,6 +36,18 @@ def args_sane(run: AgentRun) -> bool:
             path = str(call["args"].get("relative_path", ""))
             if path.endswith((".py", ".md", ".txt", ".json")):
                 return False
+
+    if task:
+        for rule in task.get("forbid_arg_patterns", []):
+            tool = rule.get("tool")
+            arg = rule.get("arg")
+            pattern = rule.get("pattern")
+            for call in run.tool_calls:
+                if call["name"] != tool:
+                    continue
+                value = str(call["args"].get(arg, ""))
+                if re.search(pattern, value):
+                    return False
     return True
 
 
@@ -72,7 +84,7 @@ def score_task(task: dict, run: AgentRun) -> TaskScore:
         recall = precision = 1.0
 
     order_ok_v = is_subsequence(expected, called) if expected else True
-    args_ok_v = args_sane(run)
+    args_ok_v = args_sane(run, task)
     answer_ok_v = answer_ok(task, run.final_answer)
 
     composite = (

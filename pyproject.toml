@@ -20,7 +20,8 @@ dev = [
 
 [project.scripts]
 kite-agent = "kite_agent.cli:main"
-kite-loop = "kite_agent.loop:main"
+kite-search = "kite_agent.search:main"
+kite-eval-gate = "kite_agent.eval_gate:main"
 
 [build-system]
 requires = ["hatchling"]
