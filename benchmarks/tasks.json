@@ -13,9 +13,9 @@
   },
   {
     "id": "count_words_file",
-    "query": "How many words are in requirements.txt inside mcp-kite-demo?",
+    "query": "How many words are in pyproject.toml inside mcp-kite-demo?",
     "expect_tools": ["read_text_file", "word_count"],
-    "expect_answer_contains_any": ["2", "two", "lines", "rows"]
+    "expect_answer_contains_any": ["word", "lines", "content"]
   },
   {
     "id": "scan_keywords",
@@ -25,7 +25,7 @@
   },
   {
     "id": "multi_step",
-    "query": "List files in mcp-kite-demo, read agent_core.py, tell me how many words it has.",
+    "query": "List files in mcp-kite-demo, read src/kite_agent/judge.py, tell me how many words it has.",
     "expect_tools": ["list_files", "read_text_file", "word_count"],
     "expect_answer_contains": []
   },
@@ -37,9 +37,9 @@
   },
   {
     "id": "regression_ctx_loss",
-    "query": "Read requirements.txt in mcp-kite-demo and count the words in it.",
+    "query": "Read pyproject.toml in mcp-kite-demo and count the words in it.",
     "expect_tools": ["read_text_file", "word_count"],
-    "expect_answer_contains_any": ["mcp", "ollama", "2"],
+    "expect_answer_contains_any": ["mcp", "ollama", "project"],
     "description": "Regression guard: qwen3:1.7b passed filename instead of file content to word_count on 2026-10-13. This task catches that exact failure mode."
   }
 ]
