@@ -9,3 +9,4 @@ history.jsonl
 *.egg-info/
 build/
 dist/
+history.v1.jsonl

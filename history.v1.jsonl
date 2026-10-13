@@ -1,2 +1,0 @@
-{"generation": 0, "fingerprint": "qwen3:1.7b|t=0.2|s=6|p=06cc12", "score": 0.85, "accepted": true, "config": {"system_prompt": "You are a concise assistant. Use tools when helpful.", "temperature": 0.2, "max_steps": 6, "model": "qwen3:1.7b"}}
-{"generation": 1, "fingerprint": "qwen3:1.7b|t=0.0|s=8|p=06cc12", "score": 0.95, "accepted": true, "config": {"system_prompt": "You are a concise assistant. Use tools when helpful.", "temperature": 0.0, "max_steps": 8, "model": "qwen3:1.7b"}}
