@@ -88,8 +88,7 @@ async def main(generations: int = 3, seed: int = 42) -> None:
         candidate = mutate(best, rng)
         print(f"=== generation {gen} ===")
         print(
-            f"  model={candidate.model}  temp={candidate.temperature}  "
-            f"steps={candidate.max_steps}"
+            f"  model={candidate.model}  temp={candidate.temperature}  steps={candidate.max_steps}"
         )
         print(f"  prompt: {candidate.system_prompt[:70]}")
         score = await evaluate(candidate, tasks, verbose=True)
